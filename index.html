@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abanoub Extractor PICO</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --accent: #238636;
+    --accent-hover: #2ea043;
+    --text: #e6edf3;
+    --text-muted: #7d8590;
+    --blue: #1f6feb;
+    --blue-light: #388bfd;
+    --tag-bg: #1c2b3a;
+    --tag-text: #79c0ff;
+    --error: #f85149;
+    --purple: #bc6ee6;
+    --orange: #f87a18;
+    --teal: #4ac2aa;
+    --gold: #d29922;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 2.5rem 1rem 3rem;
+  }
+
+  .container { max-width: 880px; margin: 0 auto; }
+
+  /* ── Header ── */
+  header { text-align: center; margin-bottom: 2.8rem; }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .logo-icon {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, #1f6feb, #388bfd);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+
+  .logo-text h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .logo-text .subtitle-brand {
+    font-size: 13px;
+    color: var(--blue-light);
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .header-desc {
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── PICO pill tags ── */
+  .pico-pills {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 1rem 0 0;
+  }
+
+  .pico-pill {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .pill-p { background: rgba(210,153,34,0.15); color: var(--gold); border: 1px solid rgba(210,153,34,0.3); }
+  .pill-i { background: rgba(188,110,230,0.15); color: var(--purple); border: 1px solid rgba(188,110,230,0.3); }
+  .pill-c { background: rgba(248,122,24,0.15); color: var(--orange); border: 1px solid rgba(248,122,24,0.3); }
+  .pill-o { background: rgba(74,194,170,0.15); color: var(--teal); border: 1px solid rgba(74,194,170,0.3); }
+
+  /* ── Input card ── */
+  .input-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.6rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .input-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    padding: 13px 15px;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    line-height: 1.6;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--blue-light);
+    box-shadow: 0 0 0 3px rgba(56,139,253,0.12);
+  }
+
+  textarea::placeholder { color: var(--text-muted); font-family: 'Inter', sans-serif; }
+
+  .input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    align-items: center;
+  }
+
+  .ex-label { font-size: 12px; color: var(--text-muted); }
+
+  .example-tag {
+    background: var(--tag-bg);
+    border: 1px solid rgba(56,139,253,0.25);
+    border-radius: 6px;
+    color: var(--tag-text);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    transition: all 0.15s;
+  }
+  .example-tag:hover { background: rgba(31,111,235,0.2); border-color: var(--blue-light); }
+
+  .btn-extract {
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 22px;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .btn-extract:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .btn-extract:active { transform: translateY(0); }
+  .btn-extract:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; }
+
+  /* ── Status ── */
+  .status-bar {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 16px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 1.2rem;
+  }
+
+  .spinner {
+    width: 15px; height: 15px;
+    border: 2px solid var(--border);
+    border-top-color: var(--blue-light);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Error ── */
+  .error-card {
+    background: rgba(248,81,73,0.08);
+    border: 1px solid rgba(248,81,73,0.3);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    color: var(--error);
+    font-size: 14px;
+    display: none;
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+  }
+
+  /* ── Results ── */
+  .results-section { display: none; }
+
+  .source-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(56,139,253,0.1);
+    border: 1px solid rgba(56,139,253,0.2);
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--blue-light);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .study-title-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem 1.3rem;
+    transition: border-color 0.2s;
+  }
+  .result-card:hover { border-color: #484f58; }
+  .result-card.full-width { grid-column: 1 / -1; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+    padding-bottom: 9px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-icon {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+  }
+
+  .card-value {
+    font-size: 14.5px;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  .card-value.number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--blue-light);
+  }
+
+  .arms-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+  .arm-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--blue);
+    border-radius: 6px;
+    padding: 9px 13px;
+    font-size: 14px;
+  }
+
+  .arm-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--blue-light);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 4px;
+  }
+
+  /* Card accent colors */
+  .icon-p { background: rgba(210,153,34,0.15); }
+  .icon-i { background: rgba(188,110,230,0.15); }
+  .icon-c { background: rgba(248,122,24,0.15); }
+  .icon-o { background: rgba(74,194,170,0.15); }
+  .icon-d { background: rgba(56,139,253,0.15); }
+  .icon-s { background: rgba(35,134,54,0.15); }
+
+  /* ── API key setup ── */
+  .setup-card {
+    background: rgba(56,139,253,0.06);
+    border: 1px solid rgba(56,139,253,0.2);
+    border-radius: 10px;
+    padding: 1.1rem 1.4rem;
+    margin-bottom: 1.2rem;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .setup-card strong { color: var(--text); }
+
+  .api-key-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .api-key-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 9px 12px;
+  }
+  .api-key-input:focus { outline: none; border-color: var(--blue-light); }
+
+  .btn-save-key {
+    background: var(--blue);
+    border: none; border-radius: 7px;
+    color: white; cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 9px 16px; white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .btn-save-key:hover { background: var(--blue-light); }
+
+  .key-status { font-size: 12px; margin-top: 7px; }
+  .key-ok { color: var(--accent-hover); }
+  .key-no { color: var(--text-muted); }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    line-height: 1.8;
+  }
+
+  footer a { color: var(--blue-light); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .results-grid { grid-template-columns: 1fr; }
+    .result-card.full-width { grid-column: 1; }
+    .logo-text h1 { font-size: 1.5rem; }
+    .input-footer { flex-direction: column; align-items: flex-start; }
+    .btn-extract { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-row">
+      <div class="logo-icon">🔬</div>
+      <div class="logo-text">
+        <h1>Abanoub Extractor PICO</h1>
+        <div class="subtitle-brand">AI · Clinical Research Tool</div>
+      </div>
+    </div>
+    <p class="header-desc">Paste a DOI, PubMed URL, or study title — get structured PICO data extracted instantly.</p>
+    <div class="pico-pills">
+      <span class="pico-pill pill-p">P · Population</span>
+      <span class="pico-pill pill-i">I · Intervention</span>
+      <span class="pico-pill pill-c">C · Comparator</span>
+      <span class="pico-pill pill-o">O · Outcome</span>
+    </div>
+  </header>
+
+  <!-- API Key Setup -->
+  <div class="setup-card" id="setupCard">
+    <strong>⚙️ One-time setup:</strong> This tool uses the Claude AI API. Enter your free Anthropic API key below — it's saved in your browser only and never sent anywhere else.
+    Get a free key at <a href="https://console.anthropic.com/" target="_blank" style="color:var(--blue-light)">console.anthropic.com</a>
+    <div class="api-key-row">
+      <input type="password" class="api-key-input" id="apiKeyInput" placeholder="sk-ant-api03-..." />
+      <button class="btn-save-key" onclick="saveKey()">Save Key</button>
+    </div>
+    <div class="key-status" id="keyStatus"></div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-card">
+    <label class="input-label">Study Input — DOI · URL · Title</label>
+    <textarea id="studyInput" placeholder="e.g.  10.1056/NEJMoa2001017
+or   https://pubmed.ncbi.nlm.nih.gov/32007295/
+or   A randomized trial of hydroxychloroquine as postexposure prophylaxis for Covid-19"></textarea>
+    <div class="input-footer">
+      <div class="examples">
+        <span class="ex-label">Try:</span>
+        <span class="example-tag" onclick="setExample('doi')">DOI example</span>
+        <span class="example-tag" onclick="setExample('pubmed')">PubMed URL</span>
+        <span class="example-tag" onclick="setExample('title')">Study title</span>
+        <span class="example-tag" onclick="setExample('rct')">RCT example</span>
+      </div>
+      <button class="btn-extract" id="extractBtn" onclick="extractData()">
+        <span>Extract PICO</span> <span>→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="statusBar">
+    <div class="spinner"></div>
+    <span id="statusText">Connecting to Claude AI and analyzing the study...</span>
+  </div>
+
+  <!-- Error -->
+  <div class="error-card" id="errorCard"></div>
+
+  <!-- Results -->
+  <div class="results-section" id="resultsSection">
+    <div class="source-row">
+      <span class="source-badge" id="sourceBadge"></span>
+      <span class="study-title-text" id="studyTitleText"></span>
+    </div>
+
+    <div class="results-grid">
+
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-icon icon-p">👥</div>
+          <span class="card-title">P — Population</span>
+        </div>
+        <div class="card-value" id="valPopulation"></div>
+      </div>
+
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-icon icon-d">📐</div>
+          <span class="card-title">Study Design</span>
+        </div>
+        <div class="card-value" id="valDesign"></div>
+      </div>
+
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-icon icon-s">🔢</div>
+          <span class="card-title">Sample Size (N)</span>
+        </div>
+        <div class="card-value number" id="valSample"></div>
+      </div>
+
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-icon icon-i">💊</div>
+          <span class="card-title">I — Intervention</span>
+        </div>
+        <div class="card-value" id="valIntervention"></div>
+      </div>
+
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-icon icon-c">⚖️</div>
+          <span class="card-title">C — Comparator</span>
+        </div>
+        <div class="card-value" id="valComparator"></div>
+      </div>
+
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-icon icon-o">🎯</div>
+          <span class="card-title">O — Primary Outcome</span>
+        </div>
+        <div class="card-value" id="valOutcome"></div>
+      </div>
+
+      <div class="result-card full-width">
+        <div class="card-header">
+          <div class="card-icon icon-d">🔀</div>
+          <span class="card-title">Study Arms</span>
+        </div>
+        <ul class="arms-list" id="valArms"></ul>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    Abanoub Extractor PICO · Powered by Claude AI &nbsp;·&nbsp;
+    Free to use · No data stored · No login required<br>
+    <small>Press <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:11px">Ctrl + Enter</kbd> to extract</small>
+  </footer>
+
+</div>
+
+<script>
+const EXAMPLES = {
+  doi:    '10.1056/NEJMoa2001017',
+  pubmed: 'https://pubmed.ncbi.nlm.nih.gov/32007295/',
+  title:  'A randomized trial of hydroxychloroquine as postexposure prophylaxis for Covid-19',
+  rct:    'Effect of high-dose zinc and ascorbic acid supplementation vs usual care on symptom length and reduction among ambulatory patients with SARS-CoV-2 infection'
+};
+
+function setExample(type) {
+  document.getElementById('studyInput').value = EXAMPLES[type];
+  document.getElementById('studyInput').focus();
+}
+
+function saveKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val.startsWith('sk-ant-')) {
+    document.getElementById('keyStatus').innerHTML = '<span class="key-no">⚠️ Key should start with sk-ant-...</span>';
+    return;
+  }
+  localStorage.setItem('abanoub_api_key', val);
+  document.getElementById('keyStatus').innerHTML = '<span class="key-ok">✓ Key saved in your browser</span>';
+  document.getElementById('setupCard').style.opacity = '0.5';
+}
+
+function getKey() {
+  return localStorage.getItem('abanoub_api_key') || '';
+}
+
+window.onload = function() {
+  const saved = getKey();
+  if (saved) {
+    document.getElementById('apiKeyInput').value = saved;
+    document.getElementById('keyStatus').innerHTML = '<span class="key-ok">✓ Key loaded from browser storage</span>';
+    document.getElementById('setupCard').style.opacity = '0.5';
+  }
+};
+
+async function extractData() {
+  const input = document.getElementById('studyInput').value.trim();
+  if (!input) { alert('Please enter a DOI, URL, or study title.'); return; }
+
+  const apiKey = getKey();
+  if (!apiKey) {
+    document.getElementById('errorCard').style.display = 'block';
+    document.getElementById('errorCard').textContent = '⚠️ Please enter and save your Anthropic API key first (see setup section above).';
+    return;
+  }
+
+  const btn = document.getElementById('extractBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>Extracting...</span>';
+
+  document.getElementById('statusBar').style.display = 'flex';
+  document.getElementById('statusText').textContent = 'Analyzing study with Claude AI...';
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('errorCard').style.display = 'none';
+
+  const prompt = `You are a clinical research data extractor specializing in PICO framework analysis.
+
+The user provided this study input: "${input}"
+
+This may be a DOI, PubMed URL, or full study title. Use your knowledge to extract the following structured data. If you recognize the study, provide accurate information. If uncertain about a field, write "Not clearly specified" rather than guessing wildly.
+
+Return ONLY valid JSON (no markdown code fences, no explanation, no preamble):
+{
+  "title": "Full official study title",
+  "source": "DOI or PubMed ID (e.g. PMID: 32007295 or DOI: 10.1056/...)",
+  "population": "Describe the study population: age range, condition/disease, eligibility criteria summary",
+  "study_design": "Study design type and key features (e.g. Double-blind RCT, multicenter, parallel-group, 4-week follow-up)",
+  "sample_size": 821,
+  "intervention": "The experimental intervention: drug name, dose, duration, route",
+  "comparator": "The control/comparison: placebo, standard care, alternative treatment with details",
+  "primary_outcome": "Primary endpoint(s) with measurement method and timepoint",
+  "secondary_outcomes": "Key secondary outcomes (brief)",
+  "arms": [
+    { "name": "Arm label", "description": "What participants in this arm received" }
+  ]
+}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error?.message || `API error ${response.status}. Check your API key.`);
+    }
+
+    const data = await response.json();
+    const raw = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch { throw new Error('Failed to parse AI response. Please try again.'); }
+
+    displayResults(parsed);
+
+  } catch (err) {
+    document.getElementById('errorCard').style.display = 'block';
+    document.getElementById('errorCard').innerHTML = '⚠️ <strong>Error:</strong> ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>Extract PICO</span> <span>→</span>';
+    document.getElementById('statusBar').style.display = 'none';
+  }
+}
+
+function displayResults(d) {
+  document.getElementById('sourceBadge').textContent = d.source || 'Study';
+  document.getElementById('studyTitleText').textContent = d.title || '';
+  document.getElementById('valPopulation').textContent = d.population || 'Not specified';
+  document.getElementById('valDesign').textContent = d.study_design || 'Not specified';
+  document.getElementById('valSample').textContent = d.sample_size ? Number(d.sample_size).toLocaleString() : 'N/A';
+  document.getElementById('valIntervention').textContent = d.intervention || 'Not specified';
+  document.getElementById('valComparator').textContent = d.comparator || 'Not specified';
+  document.getElementById('valOutcome').textContent = d.primary_outcome || 'Not specified';
+
+  const armsList = document.getElementById('valArms');
+  armsList.innerHTML = '';
+  if (d.arms && d.arms.length) {
+    d.arms.forEach((arm, i) => {
+      const li = document.createElement('li');
+      li.className = 'arm-item';
+      li.innerHTML = `<div class="arm-name">Arm ${i+1}: ${arm.name}</div><div style="color:var(--text);font-size:14px">${arm.description}</div>`;
+      armsList.appendChild(li);
+    });
+  } else {
+    armsList.innerHTML = '<li class="arm-item"><div style="color:var(--text-muted)">No arms data found</div></li>';
+  }
+
+  document.getElementById('resultsSection').style.display = 'block';
+  document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.getElementById('studyInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) extractData();
+});
+</script>
+</body>
+</html>
